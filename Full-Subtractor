@@ -1,0 +1,57 @@
+module full_subtractor(
+    input  logic a, b, bin,
+    output logic diff, bout
+);
+
+    assign diff = a ^ b ^ bin;
+    assign bout = (~a & b) | (~a & bin) | (b & bin);
+
+endmodule
+
+
+
+module full_subtractor_tb();
+
+  logic a, b, bin, bout, diff;
+  logic bout1, diff1;
+
+  full_subtractor uut (
+    .a(a),
+    .b(b),
+    .bin(bin),
+    .bout(bout),
+    .diff(diff)
+  );
+
+  always @(*) begin
+
+    // Reference checker
+    diff1 = a ^ b ^ bin;
+    bout1 = (~a & b) | (~a & bin) | (b & bin);
+
+    if ((diff == diff1) && (bout == bout1))
+      $display("Success");
+    else
+      $display("Fail");
+
+  end
+
+  initial begin
+
+    $dumpfile("full_subtractor.vcd");
+    $dumpvars(0, full_subtractor_tb);
+
+    $display("Time  A B Bin | Diff Bout");
+
+    for (int i = 0; i < 8; i++) begin
+      #5 {a, b, bin} = i[2:0];
+
+      $display("%0t    %b %b  %b  |  %b    %b",
+               $time, a, b, bin, diff, bout);
+    end
+
+    #5 $finish;
+
+  end
+
+endmodule
